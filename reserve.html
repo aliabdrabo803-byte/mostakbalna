@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserve | MOSTAKBLNA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;900&family=Orbitron:wght@400;900&family=Fira+Code:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --brand-blue: #0066ff; 
+            --dark: #010409;
+            --text: #e6edf3;
+            --input-bg: rgba(255, 255, 255, 0.03);
+        }
+
+        /* الإعدادات العامة */
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+
+        body {
+            background: var(--dark);
+            color: var(--text);
+            font-family: 'Cairo', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* كشاف الماوس */
+        #cursor { position: fixed; width: 600px; height: 600px; background: radial-gradient(circle, rgba(0, 102, 255, 0.15) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); mix-blend-mode: screen; }
+        #dot { position: fixed; width: 8px; height: 8px; background: var(--brand-blue); border-radius: 50%; z-index: 10000; box-shadow: 0 0 20px var(--brand-blue); pointer-events: none; transform: translate(-50%, -50%); }
+
+        /* طبقة الكوتس */
+        #quotes-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        .bg-quote { position: absolute; font-family: 'Fira Code', monospace; font-size: 0.8rem; color: var(--brand-blue); opacity: 0.15; white-space: nowrap; }
+
+        /* الناف بار */
+        .main-nav {
+            position: fixed;
+            top: 30px; left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            background: rgba(1, 4, 9, 0.8);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 102, 255, 0.2);
+            border-radius: 50px;
+            padding: 12px 40px;
+        }
+        .nav-container { display: flex; gap: 35px; }
+        /* تنسيق روابط الناف بار مع ضبط الخط السفلي */
+.nav-link {
+    text-decoration: none;
+    color: #94a3b8;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    position: relative;
+    padding: 5px 0; /* مسافة بسيطة حول النص */
+    transition: 0.3s;
+}
+
+/* الخط اللي بيظهر تحت الكلام */
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; /* مكانه تحت الكلام بالظبط */
+    right: 0; /* يبدأ من اليمين لأن الموقع RTL */
+    width: 0; /* يبدأ بعرض صفر */
+    height: 2px;
+    background: var(--brand-blue);
+    box-shadow: 0 0 10px var(--brand-blue); /* توهج للخط */
+    transition: width 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* تأثير عند الوقوف بالماوس أو لما تكون الصفحة نشطة */
+.nav-link:hover, .nav-link.active {
+    color: var(--brand-blue);
+    text-shadow: 0 0 10px var(--brand-blue);
+}
+
+.nav-link:hover::after, .nav-link.active::after {
+    width: 100%; /* الخط يفرش تحت الكلمة كلها */
+    right: 0;
+}
+
+        /* حاوية الحجز */
+        .reserve-wrapper {
+            padding: 150px 5% 100px;
+            display: flex;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .reserve-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(0, 102, 255, 0.1);
+            border-radius: 40px;
+            padding: 50px 40px;
+            width: 100%;
+            max-width: 550px;
+            text-align: center;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+        }
+
+        .reserve-card h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--brand-blue);
+            letter-spacing: 5px;
+            margin-bottom: 40px;
+            font-size: 2rem;
+            text-shadow: 0 0 15px var(--brand-blue);
+        }
+
+        /* تنسيق الحقول */
+        .input-group { margin-bottom: 25px; text-align: right; }
+        .input-group label { display: block; color: #94a3b8; margin-bottom: 10px; font-size: 0.9rem; margin-right: 10px; }
+        
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 16px 20px;
+            background: var(--input-bg);
+            border: 1px solid rgba(0, 102, 255, 0.15);
+            border-radius: 20px;
+            color: #fff;
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.4s;
+        }
+
+        /* ضبط ألوان القائمة المنسدلة (Select) */
+        .input-group select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%230066ff' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left 15px center;
+            background-size: 20px;
+            cursor: pointer;
+        }
+
+        .input-group select option {
+            background: #0d1117; /* لون غامق متناسق مع الخلفية */
+            color: #fff;
+            padding: 10px;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            border-color: var(--brand-blue);
+            background: rgba(0, 102, 255, 0.08);
+            box-shadow: 0 0 20px rgba(0, 102, 255, 0.15);
+        }
+
+        /* زر الإرسال */
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: transparent;
+            border: 1px solid var(--brand-blue);
+            border-radius: 20px;
+            color: var(--brand-blue);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            letter-spacing: 5px;
+            transition: 0.5s;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            background: var(--brand-blue);
+            color: #fff;
+            box-shadow: 0 0 30px var(--brand-blue);
+            transform: translateY(-5px);
+        }
+
+        /* الفوتر */
+        footer {
+            margin-top: auto;
+            padding: 30px 5%;
+            background: rgba(1, 4, 9, 0.95);
+            border-top: 1px solid rgba(0, 102, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+        }
+        /* تنسيق طبقة الكوتس */
+#quotes-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1; /* خلف العناصر الأساسية */
+    pointer-events: none; /* عشان ميعطلش الكليكات */
+    overflow: hidden;
+}
+
+.bg-quote {
+    position: absolute;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.8rem;
+    color: var(--brand-blue); /* هيستخدم اللون الأزرق اللي معرفينه */
+    opacity: .345; /* بتبدأ مخفية */
+    white-space: nowrap;
+    user-select: none;
+    transition: opacity 2s ease;
+}
+    </style>
+</head>
+<body>
+    <div id="quotes-layer"></div>
+
+    <div id="cursor"></div>
+    <div id="dot"></div>
+    <div id="quotes-layer"></div>
+
+    <nav class="main-nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="about.html" class="nav-link">Who Are Us</a>
+            <a href="reserve.html" class="nav-link active">Join to us </a>
+            <!-- <a href="index.html\#contact" class="nav-link">Contact</a> -->
+        </div>
+    </nav>
+
+    <div class="reserve-wrapper">
+        <div class="reserve-card">
+            <h1>RESERVE_NOW</h1>
+            <form id="reserveForm">
+                <div class="input-group">
+                    <label>الاسم بالكامل</label>
+                    <input type="text" placeholder="اكتب اسمك الثلاثي..." required>
+                </div>
+                <div class="input-group">
+                    <label>رقم الواتساب</label>
+                    <input type="tel" placeholder="01xxxxxxxxx" required>
+                </div>
+                <div class="input-group">
+                    <label>السنة الدراسية</label>
+                    <select required>
+                        <option value="" disabled selected>اختر المرحلة الدراسية</option>
+                        <option value="1">الصف الأول الثانوي</option>
+                        <option value="2">الصف الثاني الثانوي</option>
+                        <option value="3">الصف الثالث الثانوي</option>
+                        <option value="college">طالب جامعي / خريج</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn">CONFIRM_DATA</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <div style="font-size: 0.75rem; color: #475569; font-family: 'Orbitron'; letter-spacing: 2px;">MOSTAKBLNA ACADEMY // EST 2021</div>
+        <div style="display: flex; gap: 20px;">
+            <a href="#" style="color: #94a3b8;"><i class="fab fa-whatsapp"></i></a>
+            <a href="#" style="color: #94a3b8;"><i class="fab fa-facebook-f"></i></a>
+        </div>
+    </footer>
+
+    <script>
+        // كشاف الماوس
+        const cursor = document.getElementById('cursor');
+        const dot = document.getElementById('dot');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px';
+            dot.style.left = e.clientX + 'px'; dot.style.top = e.clientY + 'px';
+        });
+
+        // نظام الكوتس العشوائية
+        const quotes = [
+            "The best way to predict the future is to invent it.",
+            "Quality is not an act, it is a habit.",
+            "Design is the silent ambassador of your brand.",
+            "First, solve the problem. Then, write the code."
+        ];
+        const layer = document.getElementById('quotes-layer');
+        function createQuote() {
+            const q = document.createElement('div');
+            q.className = 'bg-quote';
+            q.innerText = quotes[Math.floor(Math.random() * quotes.length)];
+            q.style.left = Math.random() * window.innerWidth + 'px';
+            q.style.top = Math.random() * window.innerHeight + 'px';
+            q.style.transition = "opacity 2s";
+            layer.appendChild(q);
+            setTimeout(() => { q.style.opacity = '0'; setTimeout(() => q.remove(), 2000); }, 10000);
+        }
+        setInterval(createQuote, 3500);
+
+        // تنبيه عند الإرسال
+        document.getElementById('reserveForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('عاش يا بطل! تم استلام بياناتك بنجاح وهنتواصل معاك فوراً.');
+        });
+        // قائمة الجمل - تقدر تزود اللي أنت عايزه هنا
+    const quotesList = [
+        "The best way to predict the future is to invent it.",
+        "Quality is not an act, it is a habit.",
+        "Simplicity is the ultimate sophistication.",
+        "Stay hungry, stay foolish.",
+        "First, solve the problem. Then, write the code.",
+        "Code is like humor. When you have to explain it, it’s bad.",
+        "Design is the silent ambassador of your brand.",
+        "Fix the cause, not just the symptom."
+    ];
+
+    const container = document.getElementById('quotes-layer');
+
+    function spawnQuote() {
+        const quoteEl = document.createElement('div');
+        quoteEl.className = 'bg-quote';
+        quoteEl.innerText = quotesList[Math.floor(Math.random() * quotesList.length)];
+        
+        // توزيع عشوائي في الشاشة
+        const posX = Math.random() * window.innerWidth;
+        const posY = Math.random() * window.innerHeight;
+        
+        quoteEl.style.left = posX + 'px';
+        quoteEl.style.top = posY + 'px';
+        
+        container.appendChild(quoteEl);
+
+        // إظهار الجملة (Fade In)
+        setTimeout(() => {
+            quoteEl.style.opacity = '0.15'; // درجة الشفافية في الخلفية
+        }, 100);
+
+        // حركة بسيطة للجملة (تزحف ببطء)
+        const moveX = (Math.random() - 0.5) * 100;
+        const moveY = (Math.random() - 0.5) * 100;
+        quoteEl.animate([
+            { transform: 'translate(0, 0)' },
+            { transform: `translate(${moveX}px, ${moveY}px)` }
+        ], {
+            duration: 15000,
+            iterations: 1
+        });
+
+        // إخفاء وحذف الجملة بعد فترة عشان ميثقلش الموقع
+        setTimeout(() => {
+            quoteEl.style.opacity = '0';
+            setTimeout(() => {
+                quoteEl.remove();
+            }, 2000);
+        }, 12000);
+    }
+
+    // إنشاء أول 10 جمل فوراً
+    for(let i = 0; i < 10; i++) {
+        setTimeout(spawnQuote, i * 500);
+    }
+
+    // إضافة جملة جديدة كل 4 ثواني
+    setInterval(spawnQuote, 4000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOSTAKBLNA | The Blue Nexus UHD</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;900&family=Orbitron:wght@400;900&family=Fira+Code:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --brand-blue: #0066ff; 
+            --neon-glow: rgba(0, 102, 255, 0.4);
+            --dark: #010409;
+            --text: #e6edf3;
+        }
+
+        /* الإعدادات العامة */
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+
+        body {
+            background: var(--dark);
+            color: var(--text);
+            font-family: 'Cairo', sans-serif;
+            overflow-x: hidden;
+            overflow-y: auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* طبقات الخلفية الثابتة */
+        #quotes-layer {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* كشاف الماوس */
+        #cursor {
+            position: fixed;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(0, 102, 255, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: screen;
+        }
+
+        #dot {
+            position: fixed;
+            width: 8px; height: 8px;
+            background: var(--brand-blue);
+            border-radius: 50%;
+            z-index: 10000;
+            box-shadow: 0 0 20px var(--brand-blue);
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+        }
+
+        /* الناف بار الثابت قبل كل شيء */
+        .main-nav {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            background: rgba(1, 4, 9, 0.7);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 102, 255, 0.2);
+            border-radius: 50px;
+            padding: 12px 40px;
+            width: fit-content;
+        }
+
+        .nav-container {
+            display: flex;
+            gap: 35px;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #94a3b8;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            position: relative;
+            transition: 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--brand-blue);
+            text-shadow: 0 0 10px var(--brand-blue);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px; left: 0;
+            width: 0; height: 2px;
+            background: var(--brand-blue);
+            box-shadow: 0 0 10px var(--brand-blue);
+            transition: 0.4s;
+        }
+
+        .nav-link:hover::after, .nav-link.active::after { width: 100%; }
+
+        /* المحتوى الرئيسي */
+        .hud-wrapper {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 100px;
+        }
+
+        .main-title {
+            margin-top: 180px; /* مسافة للناف بار */
+            font-family: 'Orbitron', sans-serif;
+            font-size: 8vw;
+            font-weight: 900;
+            letter-spacing: 25px;
+            background: linear-gradient(90deg, transparent, var(--brand-blue), transparent);
+            -webkit-background-clip: text;
+            background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(0, 102, 255, 0.3));
+        }
+
+        .nexus-grid {
+            display: flex;
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .node {
+            width: 300px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(0, 102, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 40px;
+            padding: 50px 30px;
+            transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            text-align: center;
+        }
+
+        .node:hover {
+            border-color: var(--brand-blue);
+            transform: scale(1.05) translateY(-25px);
+            background: rgba(0, 102, 255, 0.05);
+            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.6);
+        }
+
+        .node h3 { color: var(--brand-blue); font-size: 1.8rem; margin-bottom: 20px; font-family: 'Orbitron'; }
+        .node p { color: #a1a1aa; font-size: 0.95rem; line-height: 1.8; }
+
+        /* سكشن التواصل */
+        .contact-section {
+            position: relative;
+            z-index: 100;
+            margin: 100px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .contact-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 40px;
+            padding: 60px;
+            text-align: center;
+            width: 90%;
+            max-width: 800px;
+        }
+
+        .contact-title {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--brand-blue);
+            letter-spacing: 5px;
+            margin-bottom: 40px;
+        }
+
+        .social-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .social-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 25px;
+            text-decoration: none;
+            transition: 0.5s;
+        }
+
+        .social-box:hover {
+            transform: translateY(-10px);
+            background: rgba(0, 102, 255, 0.05);
+            border-color: var(--brand-blue);
+        }
+        /* تنسيق الكلام داخل صناديق السوشيال ميديا */
+.social-box span {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    color: var(--brand-blue); /* اللون الأزرق الأساسي */
+    letter-spacing: 2px;
+    font-weight: 900;
+    transition: 0.4s;
+    text-shadow: 0 0 5px rgba(0, 102, 255, 0.3); /* توهج خفيف */
+    margin-top: 10px;
+}
+
+/* التفاعل عند الوقوف بالماوس */
+.social-box:hover span {
+    color: #fff; /* يتحول للأبيض عشان يبرز */
+    text-shadow: 0 0 15px var(--brand-blue); /* توهج قوي عند الهوفر */
+}
+
+        .social-box i { font-size: 2.5rem; color: #94a3b8; transition: 0.4s; }
+        .whatsapp:hover i { color: #25D366; }
+        .facebook:hover i { color: #1877F2; }
+        .instagram:hover i { color: #E4405F; }
+
+        /* الفوتر */
+        footer {
+            position: relative;
+            z-index: 20;
+            padding: 30px 5%;
+            background: rgba(1, 4, 9, 0.9);
+            border-top: 1px solid rgba(0, 102, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-info { font-size: 0.75rem; color: #475569; font-family: 'Orbitron'; }
+        .social-links { display: flex; gap: 25px; }
+        .social-links a { color: #94a3b8; font-size: 1.5rem; transition: 0.4s; }
+        .social-links a:hover { color: var(--brand-blue); transform: scale(1.2); }
+
+        /* كوتس الخلفية */
+        .bg-quote {
+            position: absolute;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: var(--brand-blue);
+            opacity: 0.345;
+            white-space: nowrap;
+        }
+        /* تنسيق قائمة الاختيار - السنة الدراسية */
+.input-group select {
+    appearance: none; /* إخفاء سهم المتصفح الافتراضي */
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%230066ff' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); /* سهم أزرق مخصص */
+    background-repeat: no-repeat;
+    background-position: left 15px center; /* وضع السهم على اليسار لأن الموقع RTL */
+    background-size: 25px;
+}
+
+/* تنسيق الخيارات (Options) اللي بتظهر لما تفتح القائمة */
+.input-group select option {
+    background: #0d1117; /* خلفية غامقة جداً */
+    color: #fff; /* كلام أبيض */
+    padding: 10px;
+}
+
+/* لو المستخدم اختار حاجة (Placeholder) */
+.input-group select:invalid {
+    color: #94a3b8;
+}
+
+/* عند التركيز على القائمة */
+.input-group select:focus {
+    border-color: var(--brand-blue);
+    background-color: rgba(0, 102, 255, 0.05);
+    box-shadow: 0 0 20px rgba(0, 102, 255, 0.2);
+}
+    </style>
+</head>
+<body>
+    <div id="cursor"></div>
+    <div id="dot"></div>
+    <div id="quotes-layer"></div>
+
+    <nav class="main-nav">
+        <div class="nav-container">
+            <a href="#" class="nav-link active">Home</a>
+            <a href="about.html" class="nav-link">Who Are Us</a>
+            <a href="reserve.html" class="nav-link">Join to us </a>
+            <a href="#cotact" class="nav-link">Contact</a>
+        </div>
+    </nav>
+
+    <div class="hud-wrapper">
+        <h1 class="main-title">MOSTAKBLNA</h1>
+        
+        <div class="nexus-grid">
+            <div class="node">
+                <h3>Web Development</h3>
+                <p>تشفير المستقبل بلغات البرمجة الأكثر قوة واحترافية.</p>
+            </div>
+            <div class="node">
+                <h3>Design</h3>
+                <p>صناعة تجارب بصرية فريدة تتجاوز حدود الخيال الرقمي.</p>
+            </div>
+            <div class="node">
+                <h3>English</h3>
+                <p>إتقان لغة التواصل التقني للوصول إلى كبرى الشركات العالمية.</p>
+            </div>
+        </div>
+    </div>
+
+    <section class="contact-section" id="cotact">
+        <div class="contact-card">
+            <h2 class="contact-title">CONNECT WITH THE SYSTEM</h2>
+            <div class="social-grid">
+                <a href="https://wa.me/201559500840" target="_blank" class="social-box whatsapp">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>WHATSAPP</span>
+                </a>
+                <a href="#" target="_blank" class="social-box facebook">
+                    <i class="fab fa-facebook-f"></i>
+                    <span>FACEBOOK</span>
+                </a>
+                <a href="#" target="_blank" class="social-box instagram">
+                    <i class="fab fa-instagram"></i>
+                    <span>INSTAGRAM</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-info">MOSTAKBLNA ACADEMY // EST 2021 // ALEXANDRIA</div>
+        <div class="social-links">
+            <a href="https://wa.me/201559500840" target="_blank"><i class="fab fa-whatsapp"></i></a>
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+        </div>
+    </footer>
+
+    <script>
+        const cursor = document.getElementById('cursor');
+        const dot = document.getElementById('dot');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            dot.style.left = e.clientX + 'px';
+            dot.style.top = e.clientY + 'px';
+        });
+
+        const quotes = [
+            "The best way to predict the future is to invent it.",
+            "Design is not just what it looks like, it's how it works.",
+            "Stay hungry, stay foolish.",
+            "First, solve the problem. Then, write the code."
+        ];
+
+        const layer = document.getElementById('quotes-layer');
+
+        function createQuote() {
+            const q = document.createElement('div');
+            q.className = 'bg-quote';
+            q.innerText = quotes[Math.floor(Math.random() * quotes.length)];
+            q.style.left = Math.random() * window.innerWidth + 'px';
+            q.style.top = Math.random() * window.innerHeight + 'px';
+            q.style.transition = `transform ${20 + Math.random() * 20}s linear, opacity 2s`;
+            layer.appendChild(q);
+            setTimeout(() => { q.style.transform = `translate(${Math.random()*200}px, ${Math.random()*200}px)`; }, 100);
+            setTimeout(() => { q.style.opacity = '0'; setTimeout(() => q.remove(), 2000); }, 25000);
+        }
+
+        for(let i=0; i<20; i++) createQuote();
+</script>
+</body>
+</html>
