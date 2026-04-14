@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#010409"> ```
+
+
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us | MOSTAKBLNA</title>
@@ -8,6 +13,62 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        /* كود تحويل الموقع لأبلكيشن على الموبايل */
+@media screen and (max-width: 768px) {
+    
+    /* 1. إلغاء كشاف الماوس لأنه بيضايق في اللمس على الموبايل */
+    #cursor, #dot {
+        display: none !important;
+    }
+
+    /* 2. تحويل الناف بار ليكون في أسفل الشاشة (Tab Bar) زي تطبيقات الموبايل */
+    .main-nav {
+        top: auto !important;
+        bottom: 20px !important;
+        width: 90% !important;
+        padding: 10px 20px !important;
+        border-radius: 25px !important;
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .nav-container {
+        gap: 0 !important;
+        justify-content: space-between !important;
+    }
+
+    .nav-link {
+        font-size: 0.7rem !important; /* تصغير الخط ليناسب الشاشة */
+        letter-spacing: 1px !important;
+    }
+
+    /* 3. تظبيط العناوين الكبيرة */
+    h1 {
+        font-size: 1.8rem !important;
+        letter-spacing: 5px !important;
+    }
+
+    /* 4. تحويل البطاقات (About & Grid) لتكون تحت بعضها (Single Column) */
+    .expertise-grid, .social-grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+    }
+
+    /* 5. توسيع الحقول في صفحة الحجز لسهولة اللمس */
+    .reserve-card {
+        padding: 30px 20px !important;
+        margin: 0 10px;
+    }
+
+    .input-group input, .input-group select {
+        font-size: 16px !important; /* يمنع الموبايل من عمل Zoom تلقائي عند الكتابة */
+        padding: 12px !important;
+    }
+
+    /* 6. منع الـ Horizontal Scroll (الهزهزة الجانبية) */
+    body {
+        overflow-x: hidden;
+    }
+}
         :root {
             --brand-blue: #0066ff; 
             --dark: #010409;
@@ -306,7 +367,7 @@
     }
 
     // إنشاء أول مجموعة جمل فوراً
-    for(let i = 0; i < 15; i++) {
+    for(let i = 0; i < 25; i++) {
         createQuote();
     }
 

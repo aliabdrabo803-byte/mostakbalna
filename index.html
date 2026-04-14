@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#010409"> ```
+
+
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MOSTAKBLNA | The Blue Nexus UHD</title>
@@ -8,6 +13,62 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        /* كود تحويل الموقع لأبلكيشن على الموبايل */
+@media screen and (max-width: 768px) {
+    
+    /* 1. إلغاء كشاف الماوس لأنه بيضايق في اللمس على الموبايل */
+    #cursor, #dot {
+        display: none !important;
+    }
+
+    /* 2. تحويل الناف بار ليكون في أسفل الشاشة (Tab Bar) زي تطبيقات الموبايل */
+    .main-nav {
+        top: auto !important;
+        bottom: 20px !important;
+        width: 90% !important;
+        padding: 10px 20px !important;
+        border-radius: 25px !important;
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .nav-container {
+        gap: 0 !important;
+        justify-content: space-between !important;
+    }
+
+    .nav-link {
+        font-size: 0.7rem !important; /* تصغير الخط ليناسب الشاشة */
+        letter-spacing: 1px !important;
+    }
+
+    /* 3. تظبيط العناوين الكبيرة */
+    h1 {
+        font-size: 1.8rem !important;
+        letter-spacing: 5px !important;
+    }
+
+    /* 4. تحويل البطاقات (About & Grid) لتكون تحت بعضها (Single Column) */
+    .expertise-grid, .social-grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+    }
+
+    /* 5. توسيع الحقول في صفحة الحجز لسهولة اللمس */
+    .reserve-card {
+        padding: 30px 20px !important;
+        margin: 0 10px;
+    }
+
+    .input-group input, .input-group select {
+        font-size: 16px !important; /* يمنع الموبايل من عمل Zoom تلقائي عند الكتابة */
+        padding: 12px !important;
+    }
+
+    /* 6. منع الـ Horizontal Scroll (الهزهزة الجانبية) */
+    body {
+        overflow-x: hidden;
+    }
+}
         :root {
             --brand-blue: #0066ff; 
             --neon-glow: rgba(0, 102, 255, 0.4);
@@ -252,15 +313,26 @@
         .social-links a { color: #94a3b8; font-size: 1.5rem; transition: 0.4s; }
         .social-links a:hover { color: var(--brand-blue); transform: scale(1.2); }
 
-        /* كوتس الخلفية */
-        .bg-quote {
-            position: absolute;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.9rem;
-            color: var(--brand-blue);
-            opacity: 0.345;
-            white-space: nowrap;
-        }
+      #quotes-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.bg-quote {
+    position: absolute;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.8rem;
+    color: var(--brand-blue);
+    opacity: 0.345; /* شفافة وهادية وتفضل ثابتة */
+    white-space: nowrap;
+    user-select: none;
+}
         /* تنسيق قائمة الاختيار - السنة الدراسية */
 .input-group select {
     appearance: none; /* إخفاء سهم المتصفح الافتراضي */
@@ -288,6 +360,34 @@
     border-color: var(--brand-blue);
     background-color: rgba(0, 102, 255, 0.05);
     box-shadow: 0 0 20px rgba(0, 102, 255, 0.2);
+}
+#quotes-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.bg-quote {
+    position: absolute;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.8rem;
+    color: var(--brand-blue);
+    opacity: 0.345;
+    white-space: nowrap;
+    user-select: none;
+    /* إضافة حركة مستمرة */
+    animation: float-around 20s infinite ease-in-out alternate;
+}
+
+@keyframes float-around {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(50px, 30px) rotate(2deg); }
+    100% { transform: translate(-30px, 60px) rotate(-1deg); }
 }
     </style>
 </head>
@@ -362,29 +462,55 @@
             dot.style.left = e.clientX + 'px';
             dot.style.top = e.clientY + 'px';
         });
+   
 
-        const quotes = [
-            "The best way to predict the future is to invent it.",
-            "Design is not just what it looks like, it's how it works.",
-            "Stay hungry, stay foolish.",
-            "First, solve the problem. Then, write the code."
-        ];
+    // قائمة الجمل البرمجية
+    const quotesList = [
+        "The best way to predict the future is to invent it.",
+        "Quality is not an act, it is a habit.",
+        "Stay hungry, stay foolish.",
+        "First, solve the problem. Then, write the code.",
+        "Code is like humor. When you have to explain it, it’s bad.",
+        "Design is the silent ambassador of your brand.",
+        "Fix the cause, not just the symptom.",
+        "Simplicity is the ultimate sophistication."
+    ];
 
-        const layer = document.getElementById('quotes-layer');
+    const container = document.getElementById('quotes-layer');
 
-        function createQuote() {
-            const q = document.createElement('div');
-            q.className = 'bg-quote';
-            q.innerText = quotes[Math.floor(Math.random() * quotes.length)];
-            q.style.left = Math.random() * window.innerWidth + 'px';
-            q.style.top = Math.random() * window.innerHeight + 'px';
-            q.style.transition = `transform ${20 + Math.random() * 20}s linear, opacity 2s`;
-            layer.appendChild(q);
-            setTimeout(() => { q.style.transform = `translate(${Math.random()*200}px, ${Math.random()*200}px)`; }, 100);
-            setTimeout(() => { q.style.opacity = '0'; setTimeout(() => q.remove(), 2000); }, 25000);
+    function createMovingQuote() {
+        if (!container) return; // تأمين لو الحاوية مش موجودة
+
+        const q = document.createElement('div');
+        q.className = 'bg-quote';
+        q.innerText = quotesList[Math.floor(Math.random() * quotesList.length)];
+        
+        // توزيع عشوائي في الشاشة (بالنسبة المئوية لضمان التوافق)
+        q.style.left = Math.random() * 90 + '%';
+        q.style.top = Math.random() * 90 + '%';
+        
+        // سرعة حركة عشوائية (بين 15 و 30 ثانية)
+        const duration = 15 + Math.random() * 15;
+        // تأخير عشوائي بالسالب عشان الجمل تبدأ من نص الحركة وميبدأوش مع بعض
+        const delay = Math.random() * -20; 
+        
+        q.style.animationDuration = duration + 's';
+        q.style.animationDelay = delay + 's';
+
+        container.appendChild(q);
+    }
+
+    // تشغيل الكود بمجرد ما الصفحة تحمل بالكامل
+    window.addEventListener('load', () => {
+        // تنظيف الطبقة لو فيها حاجة قديمة
+        container.innerHTML = '';
+        
+        // إنشاء 25 جملة يفضلوا شغالين للأبد
+        for(let i = 0; i < 25; i++) {
+            createMovingQuote();
         }
-
-        for(let i=0; i<20; i++) createQuote();
+    });
 </script>
+
 </body>
 </html>
